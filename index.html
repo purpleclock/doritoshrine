@@ -13,18 +13,19 @@
       font-family: monospace;
     }
 
-    /* Spinning Dorito GIF as <img> for smooth rotation */
+    /* Fullscreen spinning Dorito GIF */
     #dorito-bg-img {
       position: fixed;
       top: 50%;
       left: 50%;
-      width: 300px; /* adjust size as needed */
-      height: 300px;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
       transform: translate(-50%, -50%);
-      animation: spin 5s linear infinite;
-      opacity: 0.4;
+      animation: spin 20s linear infinite;
+      opacity: 0.3;
       pointer-events: none;
-      z-index: -1; /* behind everything */
+      z-index: -1;
     }
 
     @keyframes spin {
@@ -45,16 +46,6 @@
       font-size: 18px;
       text-shadow: 0 0 5px black;
     }
-
-    #playAudioBtn {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -66,12 +57,9 @@
 <div id="viewerCount">Viewers Online: 1</div>
 
 <!-- Audio -->
-<audio id="music" loop>
+<audio id="music" loop muted autoplay>
   <source src="https://files.catbox.moe/5n39q2.mp3" type="audio/mpeg" />
 </audio>
-
-<!-- Button for autoplay (required by modern browsers) -->
-<button id="playAudioBtn">Play Music</button>
 
 <script>
   // ---- TIME WATCHED TRACKER ----
@@ -98,12 +86,11 @@
     return `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
-  // ---- Audio play button ----
+  // ---- Auto-unmute audio after starting ----
   const music = document.getElementById("music");
-  document.getElementById("playAudioBtn").addEventListener("click", () => {
-    music.play();
-    document.getElementById("playAudioBtn").style.display = "none";
-  });
+  music.play().then(() => {
+    music.muted = false; // unmute after autoplay
+  }).catch(e => console.log("Audio autoplay blocked:", e));
 
   // ---- LIVE VIEWER COUNT (Firebase) ----
   const firebaseConfig = {

@@ -41,6 +41,16 @@
       font-size: 18px;
       text-shadow: 0 0 5px black;
     }
+
+    /* Invisible overlay to capture first click for audio autoplay */
+    #clickToStart {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 9999;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -50,6 +60,9 @@
 
 <div id="timer">Time Watched: 0s</div>
 <div id="viewerCount">Viewers Online: 1</div>
+
+<!-- Invisible overlay for first click to start music -->
+<div id="clickToStart"></div>
 
 <!-- Audio -->
 <audio id="music" loop muted>
@@ -81,20 +94,18 @@
     return `${years}y ${months}m ${days}d ${hours}h ${minutes}m ${seconds}s`;
   }
 
-  // ---- Auto-play audio reliably ----
+  // ---- Audio autoplay fix for Chrome ----
   const music = document.getElementById("music");
+  const overlay = document.getElementById("clickToStart");
 
-  music.play().catch(() => {
-    // If autoplay blocked, start on first user interaction
-    const startMusic = () => {
-      music.play();
-      music.muted = false; // unmute
-      window.removeEventListener('click', startMusic);
-      window.removeEventListener('touchstart', startMusic);
-    };
-    window.addEventListener('click', startMusic);
-    window.addEventListener('touchstart', startMusic);
-  });
+  const startMusic = () => {
+    music.play();
+    music.muted = false; // unmute after first click
+    overlay.remove(); // remove overlay immediately
+  };
+
+  overlay.addEventListener('click', startMusic);
+  overlay.addEventListener('touchstart', startMusic);
 
   // ---- LIVE VIEWER COUNT (Firebase) ----
   const firebaseConfig = {
